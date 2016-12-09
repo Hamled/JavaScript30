@@ -58,26 +58,76 @@
   <audio data-key="76" src="sounds/tink.wav"></audio>
 
 <script>
+  var keyFromCode = {
+    "KeyA": 65,
+    "KeyS": 83,
+    "KeyD": 68,
+    "KeyF": 70,
+    "KeyG": 71,
+    "KeyH": 72,
+    "KeyJ": 74,
+    "KeyK": 75,
+    "KeyL": 76,
+  };
 
+  var keyFromEvent = function(e) {
+      var key;
+      if(e.code) {
+        key = keyFromCode[e.code];
+      } else {
+        key = e.which;
+      }
 
-  function playSound(e) {
-    const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
-    const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
-    if (!audio) return; // stop the function from running all together
-    audio.currentTime = 0; // rewind to the start
-    audio.play();
-    key.classList.add('playing');
-  }
-  function removeTransition(e) {
-    if (e.propertyName !== 'transform') return; // skip it if it's not a transform
-    this.classList.remove('playing');
-  }
+      return key;
+  };
 
-  const keys = document.querySelectorAll('.key');
-  keys.forEach(key => key.addEventListener('transitionend', removeTransition));
-  window.addEventListener('keydown', playSound);
+  var selectDiv = function(key) {
+    return document.querySelector('.key[data-key="' + key + '"]');
+  };
 
+  var selectAudio = function(key) {
+    return document.querySelector('audio[data-key="' + key + '"]');
+  };
+
+  document.addEventListener('keydown', function(e) {
+    var key = keyFromEvent(e);
+    if(!key) {
+      return;
+    }
+
+    var divEl = selectDiv(key);
+    if(divEl) {
+      if(divEl.className.indexOf('playing') === -1) {
+        divEl.className += ' playing';
+      }
+
+      var audioEl = selectAudio(key);
+      if(audioEl) {
+        audioEl.play();
+      }
+    }
+  });
+
+  document.addEventListener('keyup', function(e) {
+    var key = keyFromEvent(e);
+    if(!key) {
+      return;
+    }
+
+    var divEl = selectDiv(key);
+    if(divEl) {
+      if(divEl.className.indexOf('playing') !== -1) {
+        divEl.className = divEl.className.replace('playing', '');
+      }
+
+      var audioEl = selectAudio(key);
+      if(audioEl) {
+        audioEl.currentTime = 0;
+      }
+    }
+  });
 </script>
+
 
 </body>
 </html>
